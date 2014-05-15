@@ -3,9 +3,10 @@ package uk.ac.ncl.cs.zequn.fp.eba2LA.core;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.avg.AvgCalculateImpl;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filesystem.LogAccess;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.model.Tuple;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitor;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitorImpl;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitorListener;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultDispatcherListener;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitor;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitorImpl;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitorListener;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,10 +28,11 @@ public class MainController {
     private final TimerTask timerTask;
     private final long numOfTuples;
     private final AtomicReference<Double> resultList;
+    private final AtomicReference<String> resultStore = new AtomicReference<String>();
     private final ResultOutput resultOutput;
     private boolean calFlag = false;
-    private final MemoryMonitor memoryMonitor = new MemoryMonitorImpl(1000,new LogAccess("memory"),new LogAccess("diskWrite"),new LogAccess("diskRead"),new LogAccess("latency"));
-    //private final MemoryMonitorImpl memoryMonitor = new MemoryMonitorImpl(1000,new LogAccess("memory"),null,null,new LogAccess("latency"));
+    //private ResultMonitor resultMonitor = new ResultMonitorImpl(1000,new LogAccess("memory"),new LogAccess("diskWrite"),new LogAccess("diskRead"),new LogAccess("latency"));
+    private  ResultMonitor resultMonitor = new ResultMonitorImpl(1000,null,null,null,null);
 
     public MainController(Strategy strategy,long time,long period,ResultOutput resultOutputListener) throws SQLException, IOException {
         this.resultOutput = resultOutputListener;
@@ -38,7 +40,7 @@ public class MainController {
         this.period = period;
         this.numOfTuples = period/time;
         //define max tuple in memory
-        inMemoryStore = new InMemoryStore(true ,10*60*1,memoryMonitor);
+        inMemoryStore = new InMemoryStore(false ,10*60*1, resultMonitor);
         this.strategy = strategy;
         switch (strategy){
             case AVG:
@@ -51,7 +53,7 @@ public class MainController {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                memoryMonitor.latencyBefore();
+                resultMonitor.latencyBefore();
                 Tuple newTuple = factory.getResult();
                 if(newTuple == null) return;
                 Tuple oldTuple = null;
@@ -66,8 +68,10 @@ public class MainController {
                     resultList.set(calculate.updateResult(-1, inMemoryStore.getRealSize(), newTuple, oldTuple));
                 }
 
-                resultOutput.output(calculate.getResult(resultList.get(),inMemoryStore.getRealSize())+"");
-                memoryMonitor.latencyAfter();
+                //resultOutput.output(calculate.getResult(resultList.get(),inMemoryStore.getRealSize())+"");
+                resultStore.set(calculate.getResult(resultList.get(),inMemoryStore.getRealSize()));
+                resultMonitor.latencyAfter();
+
             }
         };
 //        garbage collect
@@ -79,19 +83,26 @@ public class MainController {
 //        };
 //        new Timer().scheduleAtFixedRate(gc,0,1000*60*5);
 
-        memoryMonitor.addListener(new MemoryMonitorListener() {
+        resultMonitor.addListener(new ResultMonitorListener() {
             @Override
             public void monitor() {
                 System.out.println("total input:"+inMemoryStore.getRealSize());
+
             }
         });
-        memoryMonitor.addListener(new MemoryMonitorListener() {
+        resultMonitor.addListener(new ResultMonitorListener() {
             @Override
             public void monitor() {
                 System.out.println("total tuples:"+inMemoryStore.getSize());
             }
         });
-        memoryMonitor.start();
+        resultMonitor.start();
+    }
+    public void setMonitor(ResultMonitor resultMonitor){
+        this.resultMonitor =  resultMonitor;
+    }
+    public String getResult(){
+        return resultStore.get();
     }
     public void offer(double input){
         if(!calFlag) {
@@ -99,10 +110,10 @@ public class MainController {
             new Timer().scheduleAtFixedRate(timerTask,0,time);
         }
         factory.offer(input);
-        memoryMonitor.inputRateCount();
+        resultMonitor.inputRateCount();
     }
 
     public void end(){
-        memoryMonitor.flushLog();
+        resultMonitor.flushLog();
     }
 }

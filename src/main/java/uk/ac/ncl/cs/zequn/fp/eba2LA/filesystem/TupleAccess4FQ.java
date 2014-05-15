@@ -4,7 +4,7 @@ import uk.ac.ncl.cs.zequn.fp.eba2LA.filequeue.FileQueue;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filequeue.FileQueueImpl;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filequeue.ObjectConverterImpl;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.model.Tuple;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitorImpl;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitorImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,20 +37,20 @@ public class TupleAccess4FQ implements TupleAccess {
     }
 
 
-    public static void main(String [] args) throws SQLException, IOException {
-        MemoryMonitorImpl memoryMonitor = new MemoryMonitorImpl(1000,new LogAccess("fqinsert"),null,null,null);
-        Tuple tuple = new Tuple(12,3222);
-        long counter = 0;
-        TupleAccess access = new TupleAccess4FQ("D://","db");
-        memoryMonitor.start();
-        while(true){
-            memoryMonitor.inputRateCheck();
-            counter++;
-            access.insertTuple(tuple);
-            if(counter %50000 ==0){
-                memoryMonitor.flushLog();
-                break;
-            }
-        }
-    }
+//    public static void main(String [] args) throws SQLException, IOException {
+//        ResultMonitorImpl memoryMonitor = new ResultMonitorImpl(1000,new LogAccess("fqinsert"),null,null,null);
+//        Tuple tuple = new Tuple(12,3222);
+//        long counter = 0;
+//        TupleAccess access = new TupleAccess4FQ("D://","db");
+//        memoryMonitor.start();
+//        while(true){
+//            memoryMonitor.inputRateCheck();
+//            counter++;
+//            access.insertTuple(tuple);
+//            if(counter %50000 ==0){
+//                memoryMonitor.flushLog();
+//                break;
+//            }
+//        }
+//    }
 }

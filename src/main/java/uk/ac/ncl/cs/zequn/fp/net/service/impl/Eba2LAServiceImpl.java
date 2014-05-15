@@ -1,8 +1,10 @@
 package uk.ac.ncl.cs.zequn.fp.net.service.impl;
 
+import org.springframework.stereotype.Service;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.core.MainController;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.core.ResultOutput;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.core.Strategy;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultDispatcherListener;
 import uk.ac.ncl.cs.zequn.fp.net.entity.Tuple4net;
 import uk.ac.ncl.cs.zequn.fp.net.exception.ServiceNotFoundException;
 import uk.ac.ncl.cs.zequn.fp.net.service.Eba2LAService;
@@ -16,12 +18,11 @@ import java.util.Map;
 /**
  * Created by Zequn on 2014/5/11.
  */
+@Service
 public class Eba2LAServiceImpl implements Eba2LAService {
-    private Map<String,MainController> mainControllerList;
+    private Map<String,MainController> mainControllerList = new HashMap<String, MainController>();
     private int counter;
-    public Eba2LAServiceImpl() {
-        mainControllerList = new HashMap<String, MainController>();
-    }
+
 
 
     @Override
@@ -56,4 +57,17 @@ public class Eba2LAServiceImpl implements Eba2LAService {
             mainController.end();
         }
     }
+
+    @Override
+    public String getResult(String services) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String [] list = services.split("-");
+        for(String id:list){
+            MainController mainController = mainControllerList.get(id);
+            if(null == mainController) throw new ServiceNotFoundException(id);
+            stringBuilder.append(id).append(":").append(mainController.getResult()).append("  ");
+        }
+        return stringBuilder.toString();
+    }
+
 }

@@ -33,10 +33,11 @@ public class ServiceBeginController {
         });
         return Integer.valueOf(str);
     }
-    @RequestMapping(value = "/{services}")
-    @ResponseBody
-    public int stopService(@PathVariable String services) throws IOException, SQLException {
-        eba2LAService.stopService(services);
-        return 1;
-    }
+
+//    @RequestMapping(value = "/{services}")
+//    @ResponseBody
+//    public int stopService(@PathVariable String services) throws IOException, SQLException {
+//        eba2LAService.stopService(services);
+//        return 1;
+//    }
 }

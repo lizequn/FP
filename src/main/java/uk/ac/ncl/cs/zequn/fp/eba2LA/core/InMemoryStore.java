@@ -3,7 +3,7 @@ package uk.ac.ncl.cs.zequn.fp.eba2LA.core;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filesystem.TupleAccess;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filesystem.TupleAccess4FQ;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.model.Tuple;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitor;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitor;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,10 +19,10 @@ public class InMemoryStore {
     private long tupleSize = 0;
     private final TupleAccess tupleAccess;
     private final long maxSize;
-    private final MemoryMonitor memoryMonitor;
+    private final ResultMonitor resultMonitor;
     //private final LinkedBlockingDeque<Tuple> queue= new LinkedBlockingDeque<Tuple>();
     private final LinkedList<Tuple> queue = new LinkedList<Tuple>();
-    public InMemoryStore(boolean enableDiskStore,long maxSize,MemoryMonitor memoryMonitor) throws SQLException, IOException {
+    public InMemoryStore(boolean enableDiskStore,long maxSize,ResultMonitor resultMonitor) throws SQLException, IOException {
         this.enableDiskStore = enableDiskStore;
         this.maxSize = maxSize;
         if(enableDiskStore){
@@ -32,7 +32,7 @@ public class InMemoryStore {
         }else {
             this.tupleAccess = null;
         }
-        this.memoryMonitor = memoryMonitor;
+        this.resultMonitor = resultMonitor;
     }
 
     public LinkedList<Tuple> getQueue(){
@@ -46,7 +46,7 @@ public class InMemoryStore {
                 return queue.offer(tuple);
             }else {
                 realSize+=tuple.getSize();
-                memoryMonitor.diskWriteCount();
+                resultMonitor.diskWriteCount();
                 tupleAccess.insertTuple(tuple);
                 tupleSize++;
                 return true;
@@ -67,7 +67,7 @@ public class InMemoryStore {
             Tuple tuple = queue.poll();
             realSize-= tuple.getSize();
             if(queue.size()+1>=maxSize){
-                memoryMonitor.diskReadCount();
+                resultMonitor.diskReadCount();
                 Tuple newTuple = tupleAccess.getTuple();
                 if(null!=newTuple){
                     queue.offer(newTuple);
@@ -99,7 +99,7 @@ public class InMemoryStore {
 
 //    public static void main(String []args) throws SQLException, InterruptedException {
 ////        final long stopTime = 2*60*10;
-////        final MemoryMonitorImpl memoryMonitor1 = new MemoryMonitorImpl(1000,new LogAccess("abc"),null,null);
+////        final ResultMonitorImpl memoryMonitor1 = new ResultMonitorImpl(1000,new LogAccess("abc"),null,null);
 ////        final InMemoryStore inMemoryStore = new InMemoryStore(true,1000000000,memoryMonitor1);
 ////        TimerTask timerTask = new TimerTask() {
 ////            @Override

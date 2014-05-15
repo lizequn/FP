@@ -91,7 +91,7 @@ public class LogAccess {
     }
 
 //    public static void main(String [] args) throws SQLException {
-//        MemoryMonitorImpl memoryMonitor = new MemoryMonitorImpl(1000);
+//        ResultMonitorImpl memoryMonitor = new ResultMonitorImpl(1000);
 //        memoryMonitor.start();
 //        LogAccess access = new LogAccess("log");
 //        access.init();

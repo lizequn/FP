@@ -21,12 +21,9 @@ public class AvgCalculateImpl implements Calculate{
             return newTuple.getResult();
         }
         if(oldTuple == null){
-            double sum = result + newTuple.getResult();
-            return sum;
+            return result + newTuple.getResult();
         }
-        double oldResult = result;
-        double newResult = oldResult - oldTuple.getResult()+newTuple.getResult();
-        return newResult;
+        return result - oldTuple.getResult()+newTuple.getResult();
     }
 
     @Override

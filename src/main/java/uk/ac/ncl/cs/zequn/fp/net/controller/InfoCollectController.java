@@ -14,18 +14,19 @@ import uk.ac.ncl.cs.zequn.fp.net.service.Eba2LAService;
 @Controller
 @RequestMapping(value = "info")
 public class InfoCollectController {
+
     @Autowired
     private Eba2LAService service;
-    @RequestMapping(value = "/{services}/{time]/{info}")
+    @RequestMapping(value = "/{services}/{time}/{info}")
     @ResponseBody
     public int infoCollect(@PathVariable String services,@PathVariable long time,@PathVariable double info){
         service.offer(services,time,info);
         return 1;
     }
-    @RequestMapping(value = "/{services}",method = RequestMethod.POST)
-    @ResponseBody
-    public int infoCollect(@PathVariable String services,@RequestBody Tuple4net tuple4net){
-        service.offer(services,tuple4net);
-        return 1;
-    }
+//    @RequestMapping(value = "/{services}",method = RequestMethod.POST)
+//    @ResponseBody
+//    public int infoCollect(@PathVariable String services,@RequestBody Tuple4net tuple4net){
+//        service.offer(services,tuple4net);
+//        return 1;
+//    }
 }

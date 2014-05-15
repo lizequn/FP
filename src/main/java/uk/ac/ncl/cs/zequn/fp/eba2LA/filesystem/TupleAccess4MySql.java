@@ -1,7 +1,7 @@
 package uk.ac.ncl.cs.zequn.fp.eba2LA.filesystem;
 
 import uk.ac.ncl.cs.zequn.fp.eba2LA.model.Tuple;
-import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.MemoryMonitorImpl;
+import uk.ac.ncl.cs.zequn.fp.eba2LA.monitor.ResultMonitorImpl;
 
 import java.sql.*;
 
@@ -64,23 +64,23 @@ public class TupleAccess4MySql implements TupleAccess {
         return null;
     }
 
-    public static void main(String [] args) throws SQLException {
-        MemoryMonitorImpl memoryMonitor = new MemoryMonitorImpl(1000,new LogAccess("mysqlinsert"),null,null,null);
-        Tuple tuple = new Tuple(12,3222);
-        long counter = 0;
-        TupleAccess4MySql access = new TupleAccess4MySql();
-        access.init();
-        memoryMonitor.start();
-        while(true){
-            memoryMonitor.inputRateCheck();
-            counter++;
-            access.insertTuple(tuple);
-            if(counter %1000 ==0){
-                memoryMonitor.flushLog();
-                break;
-            }
-        }
-    }
+//    public static void main(String [] args) throws SQLException {
+//        ResultMonitorImpl memoryMonitor = new ResultMonitorImpl(1000,new LogAccess("mysqlinsert"),null,null,null);
+//        Tuple tuple = new Tuple(12,3222);
+//        long counter = 0;
+//        TupleAccess4MySql access = new TupleAccess4MySql();
+//        access.init();
+//        memoryMonitor.start();
+//        while(true){
+//            memoryMonitor.inputRateCheck();
+//            counter++;
+//            access.insertTuple(tuple);
+//            if(counter %1000 ==0){
+//                memoryMonitor.flushLog();
+//                break;
+//            }
+//        }
+//    }
 
 
 }
