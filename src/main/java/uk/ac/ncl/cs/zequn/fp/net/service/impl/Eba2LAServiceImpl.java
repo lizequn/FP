@@ -21,7 +21,9 @@ import java.util.Map;
 @Service
 public class Eba2LAServiceImpl implements Eba2LAService {
     private Map<String,MainController> mainControllerList = new HashMap<String, MainController>();
-    private int counter;
+    private static int counter = 0;
+    private static int realInput = 0;
+
 
 
 
