@@ -42,6 +42,7 @@ public class Eba2LAServiceImpl implements Eba2LAService {
 
     @Override
     public void offer(String services,long timestamp, double info) {
+        realInput++;
         String [] list = services.split("-");
         for(String id:list){
             MainController mainController = mainControllerList.get(id);
@@ -57,6 +58,7 @@ public class Eba2LAServiceImpl implements Eba2LAService {
             MainController mainController = mainControllerList.get(id);
             if(null == mainController) throw new ServiceNotFoundException(id);
             mainController.end();
+            mainControllerList.remove(id);
         }
     }
 
@@ -70,6 +72,11 @@ public class Eba2LAServiceImpl implements Eba2LAService {
             stringBuilder.append(id).append(":").append(mainController.getResult()).append("  ");
         }
         return stringBuilder.toString();
+    }
+
+    @Override
+    public int getTestInfo() {
+        return realInput;
     }
 
 }

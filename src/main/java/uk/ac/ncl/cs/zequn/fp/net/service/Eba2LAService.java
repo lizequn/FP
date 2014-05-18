@@ -19,5 +19,6 @@ public interface Eba2LAService {
     void offer(String services,long timestamp,double info);
     void stopService(String services);
     String getResult(String services);
+    int getTestInfo();
 }
 

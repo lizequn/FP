@@ -23,4 +23,9 @@ public class GetResultController {
         resultSet.setInfo(service.getResult(services));
         return resultSet;
     }
+    @RequestMapping(value = "/test/testinfo")
+    @ResponseBody
+    public int infoCollect(){
+        return service.getTestInfo();
+    }
 }

@@ -25,6 +25,7 @@ public class MainController {
     private final Calculate calculate;
     private final long time;
     private final long period;
+    private final Timer timer;
     private final TimerTask timerTask;
     private final long numOfTuples;
     private final AtomicReference<Double> resultList;
@@ -41,6 +42,7 @@ public class MainController {
         this.numOfTuples = period/time;
         //define max tuple in memory
         inMemoryStore = new InMemoryStore(false ,10*60*1, resultMonitor);
+        timer = new Timer();
         this.strategy = strategy;
         switch (strategy){
             case AVG:
@@ -107,13 +109,15 @@ public class MainController {
     public void offer(double input){
         if(!calFlag) {
             calFlag = true;
-            new Timer().scheduleAtFixedRate(timerTask,0,time);
+            timer.scheduleAtFixedRate(timerTask,0,time);
         }
         factory.offer(input);
         resultMonitor.inputRateCount();
     }
 
     public void end(){
+        timer.cancel();
+
         resultMonitor.flushLog();
     }
 }
