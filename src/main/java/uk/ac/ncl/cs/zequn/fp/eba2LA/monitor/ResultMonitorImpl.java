@@ -177,17 +177,18 @@ public class ResultMonitorImpl implements ResultMonitor {
 
     public void flushLog(){
         flag.set(false);
+        String storeUrl = "/Users/zequnli/FP/";
         if(null!= logAccess){
-            logAccess.output2CSV("D://",logAccess.getTable());
+            logAccess.output2CSV(storeUrl,logAccess.getTable());
         }
         if(null!= diskLog){
-            diskLog.output2CSV("D://",diskLog.getTable());
+            diskLog.output2CSV(storeUrl,diskLog.getTable());
         }
         if(null!=latencyLog4Stream){
-            latencyLog4Stream.output2CSV("D://",latencyLog4Stream.getTable());
+            latencyLog4Stream.output2CSV(storeUrl,latencyLog4Stream.getTable());
         }
         if(null!= latencyLog4Result){
-            latencyLog4Result.output2CSV("D://",latencyLog4Result.getTable());
+            latencyLog4Result.output2CSV(storeUrl,latencyLog4Result.getTable());
         }
 
     }
