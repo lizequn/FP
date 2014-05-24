@@ -20,5 +20,6 @@ public interface Eba2LAService {
     void stopService(String services);
     String getResult(String services);
     int getTestInfo();
+
 }
 

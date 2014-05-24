@@ -32,8 +32,8 @@ public class MainController {
     private final AtomicReference<String> resultStore = new AtomicReference<String>();
     private final ResultOutput resultOutput;
     private boolean calFlag = false;
-    //private ResultMonitor resultMonitor = new ResultMonitorImpl(1000,new LogAccess("memory"),new LogAccess("diskWrite"),new LogAccess("diskRead"),new LogAccess("latency"));
-    private  ResultMonitor resultMonitor = new ResultMonitorImpl(1000,null,null,null,null);
+    private ResultMonitor resultMonitor = new ResultMonitorImpl(1000,new LogAccess("memory"),new LogAccess("disk"),new LogAccess("latency4Result"),new LogAccess("latency"));
+    //private  ResultMonitor resultMonitor = new ResultMonitorImpl(1000,null,null,null,null);
 
     public MainController(Strategy strategy,long time,long period,ResultOutput resultOutputListener) throws SQLException, IOException {
         this.resultOutput = resultOutputListener;
@@ -55,7 +55,7 @@ public class MainController {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                resultMonitor.latencyBefore();
+                resultMonitor.latencyBefore4Result();
                 Tuple newTuple = factory.getResult();
                 if(newTuple == null) return;
                 Tuple oldTuple = null;
@@ -72,7 +72,7 @@ public class MainController {
 
                 //resultOutput.output(calculate.getResult(resultList.get(),inMemoryStore.getRealSize())+"");
                 resultStore.set(calculate.getResult(resultList.get(),inMemoryStore.getRealSize()));
-                resultMonitor.latencyAfter();
+                resultMonitor.latencyAfter4Result();
 
             }
         };
@@ -107,17 +107,18 @@ public class MainController {
         return resultStore.get();
     }
     public void offer(double input){
+        resultMonitor.latencyBefore4Stream();
         if(!calFlag) {
             calFlag = true;
             timer.scheduleAtFixedRate(timerTask,0,time);
         }
         factory.offer(input);
         resultMonitor.inputRateCount();
+        resultMonitor.latencyAfter4Stream();
     }
 
     public void end(){
         timer.cancel();
-
         resultMonitor.flushLog();
     }
 }

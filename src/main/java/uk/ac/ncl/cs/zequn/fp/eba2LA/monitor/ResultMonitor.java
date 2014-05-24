@@ -5,10 +5,11 @@ package uk.ac.ncl.cs.zequn.fp.eba2LA.monitor;
  */
 public interface ResultMonitor {
     void inputRateCount();
-    void diskReadCount();
-    void diskWriteCount();
-    void latencyBefore();
-    void latencyAfter();
+    void diskCount();
+    void latencyBefore4Result();
+    void latencyAfter4Result();
+    void latencyBefore4Stream();
+    void latencyAfter4Stream();
     void start();
     void flushLog();
     void addListener(ResultMonitorListener listener);
