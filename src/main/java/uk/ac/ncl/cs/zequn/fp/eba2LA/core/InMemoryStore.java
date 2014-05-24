@@ -46,7 +46,7 @@ public class InMemoryStore {
                 return queue.offer(tuple);
             }else {
                 realSize+=tuple.getSize();
-                resultMonitor.diskWriteCount();
+                resultMonitor.diskCount();
                 tupleAccess.insertTuple(tuple);
                 tupleSize++;
                 return true;
@@ -67,7 +67,7 @@ public class InMemoryStore {
             Tuple tuple = queue.poll();
             realSize-= tuple.getSize();
             if(queue.size()+1>=maxSize){
-                resultMonitor.diskReadCount();
+                resultMonitor.diskCount();
                 Tuple newTuple = tupleAccess.getTuple();
                 if(null!=newTuple){
                     queue.offer(newTuple);
