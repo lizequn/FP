@@ -57,7 +57,8 @@ public class MainController {
             public void run() {
                 resultMonitor.latencyBefore4Result();
                 Tuple newTuple = factory.getResult();
-                if(newTuple == null) return;
+                //fix bug
+                if(newTuple == null) newTuple = new Tuple(0,0);
                 Tuple oldTuple = null;
                 inMemoryStore.put(newTuple);
                 if(inMemoryStore.getSize()>numOfTuples){
@@ -69,7 +70,6 @@ public class MainController {
                 } else {
                     resultList.set(calculate.updateResult(-1, inMemoryStore.getRealSize(), newTuple, oldTuple));
                 }
-
                 //resultOutput.output(calculate.getResult(resultList.get(),inMemoryStore.getRealSize())+"");
                 resultStore.set(calculate.getResult(resultList.get(),inMemoryStore.getRealSize()));
                 resultMonitor.latencyAfter4Result();
