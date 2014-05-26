@@ -32,7 +32,7 @@ public class MainController {
     private final AtomicReference<String> resultStore = new AtomicReference<String>();
     private final ResultOutput resultOutput;
     private boolean calFlag = false;
-    private ResultMonitor resultMonitor = new ResultMonitorImpl(1000,new LogAccess("memory"),new LogAccess("disk"),new LogAccess("latency4Result"),new LogAccess("latency"));
+    private ResultMonitor resultMonitor = new ResultMonitorImpl(1000,new LogAccess("memory"),new LogAccess("disk"),new LogAccess("latency4Result"),new LogAccess("latency4Stream"),new LogAccess("latency4GetResult"));
     //private  ResultMonitor resultMonitor = new ResultMonitorImpl(1000,null,null,null,null);
 
     public MainController(Strategy strategy,long time,long period,ResultOutput resultOutputListener) throws SQLException, IOException {
@@ -41,7 +41,7 @@ public class MainController {
         this.period = period;
         this.numOfTuples = period/time;
         //define max tuple in memory
-        inMemoryStore = new InMemoryStore(false ,10*60*1, resultMonitor);
+        inMemoryStore = new InMemoryStore(false ,5*60*1, resultMonitor);
         timer = new Timer();
         this.strategy = strategy;
         switch (strategy){

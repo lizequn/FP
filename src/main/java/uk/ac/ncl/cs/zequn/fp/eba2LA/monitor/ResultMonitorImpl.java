@@ -1,5 +1,6 @@
 package uk.ac.ncl.cs.zequn.fp.eba2LA.monitor;
 
+import uk.ac.ncl.cs.zequn.fp.eba2LA.core.Config;
 import uk.ac.ncl.cs.zequn.fp.eba2LA.filesystem.LogAccess;
 
 import java.sql.SQLException;
@@ -25,22 +26,28 @@ public class ResultMonitorImpl implements ResultMonitor {
     private long latencyBefore4Result;
     private long totalLatency4Result;
     private long latencyNum4Result;
+    private long latencyBefore4GetResult;
+    private long latencyNum4GetResult;
+    private long totalLatency4GetResult;
 
     private final Object lock = new Object();
     private final Object diskLock = new Object();
     private final Object latencyLock4Result = new Object();
     private final Object latencyLock = new Object();
+    private final Object latencyLock4GetResult = new Object();
     private final List<ResultMonitorListener> listenerList = new ArrayList<ResultMonitorListener>();
     private final LogAccess logAccess;
     private final LogAccess diskLog;
     private final LogAccess latencyLog4Result;
     private final LogAccess latencyLog4Stream;
-    public ResultMonitorImpl(long interval, LogAccess logAccess, LogAccess logAccess1, LogAccess logAccess2, LogAccess logAccess3) throws SQLException {
+    private final LogAccess latencyLog4GetResult;
+    public ResultMonitorImpl(long interval, LogAccess logAccess, LogAccess logAccess1, LogAccess logAccess2, LogAccess logAccess3,LogAccess logAccess4) throws SQLException {
         this.interval = interval;
         this.logAccess = logAccess;
         diskLog = logAccess1;
         latencyLog4Result = logAccess2;
         latencyLog4Stream= logAccess3;
+        latencyLog4GetResult = logAccess4;
         if(null!=logAccess){
             this.logAccess.init();
         }
@@ -53,6 +60,9 @@ public class ResultMonitorImpl implements ResultMonitor {
         if(null!=latencyLog4Stream){
             this.latencyLog4Stream.init();
         }
+        if(null!=latencyLog4GetResult){
+            this.latencyLog4GetResult.init();
+        }
 
         flag.set(true);
     }
@@ -63,12 +73,13 @@ public class ResultMonitorImpl implements ResultMonitor {
 
 
 
-
+    @Override
     public void inputRateCount(){
         synchronized(lock){
             inputNum++;
         }
     }
+    @Override
     public void diskCount(){
         synchronized (diskLock){
             disk++;
@@ -103,6 +114,22 @@ public class ResultMonitorImpl implements ResultMonitor {
         }
     }
 
+    @Override
+    public void latencyBefore4GetResult() {
+        synchronized (latencyLock4GetResult){
+            latencyBefore4GetResult = System.nanoTime();
+        }
+    }
+
+    @Override
+    public void latencyAfter4GetResult() {
+        synchronized (latencyLock4GetResult){
+            totalLatency4GetResult+=System.nanoTime()-latencyBefore4GetResult;
+            latencyNum4GetResult++;
+        }
+
+    }
+
     public void start(){
         Thread thread = new Thread(runnable);
         thread.start();
@@ -112,7 +139,8 @@ public class ResultMonitorImpl implements ResultMonitor {
        @Override
        public void run() {
            while (flag.get()){
-               long free = Runtime.getRuntime().freeMemory();
+               long free = Runtime.getRuntime().maxMemory()-Runtime.getRuntime().freeMemory();
+
 //               System.out.println("Max Heap Size: " + B2M.byte2M(max));
 //               System.out.println("Current Free size: "+B2M.byte2M(free));
                counter++;
@@ -161,6 +189,20 @@ public class ResultMonitorImpl implements ResultMonitor {
                        latencyNum4Result = 0;
                    }
                }
+               synchronized (latencyLock4GetResult){
+                   if(null!= latencyLog4GetResult){
+                       long average;
+                       if(latencyNum4GetResult == 0){
+                           average = 0;
+                       }else {
+                           average =  TimeUnit.MICROSECONDS.convert(totalLatency4GetResult / latencyNum4GetResult,TimeUnit.NANOSECONDS);
+                       }
+                       latencyLog4GetResult.insertTuple(counter+"",average+"");
+                       System.out.println("average Latency 4 result: "+average);
+                       totalLatency4GetResult = 0;
+                       latencyNum4GetResult = 0;
+                   }
+               }
                if(listenerList.size()>0){
                    for(ResultMonitorListener listener : listenerList){
                        listener.monitor();
@@ -177,7 +219,7 @@ public class ResultMonitorImpl implements ResultMonitor {
 
     public void flushLog(){
         flag.set(false);
-        String storeUrl = "/Users/zequnli/FP/";
+        String storeUrl = Config.CSVUrl4Win;
         if(null!= logAccess){
             logAccess.output2CSV(storeUrl,logAccess.getTable());
         }
@@ -189,6 +231,9 @@ public class ResultMonitorImpl implements ResultMonitor {
         }
         if(null!= latencyLog4Result){
             latencyLog4Result.output2CSV(storeUrl,latencyLog4Result.getTable());
+        }
+        if(null!=latencyLog4GetResult){
+            latencyLog4GetResult.output2CSV(storeUrl,latencyLog4GetResult.getTable());
         }
 
     }

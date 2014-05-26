@@ -10,6 +10,8 @@ public interface ResultMonitor {
     void latencyAfter4Result();
     void latencyBefore4Stream();
     void latencyAfter4Stream();
+    void latencyBefore4GetResult();
+    void latencyAfter4GetResult();
     void start();
     void flushLog();
     void addListener(ResultMonitorListener listener);

@@ -27,7 +27,7 @@ public class InMemoryStore {
         this.maxSize = maxSize;
         if(enableDiskStore){
 //        this.tupleAccess = new TupleAccess4MySql();
-        this.tupleAccess = new TupleAccess4FQ("D://","db");
+        this.tupleAccess = new TupleAccess4FQ(Config.inMemoryUrl4Win,"db");
         this.tupleAccess.init();
         }else {
             this.tupleAccess = null;
