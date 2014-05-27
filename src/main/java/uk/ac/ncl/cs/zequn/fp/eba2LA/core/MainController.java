@@ -104,7 +104,10 @@ public class MainController {
         this.resultMonitor =  resultMonitor;
     }
     public String getResult(){
-        return resultStore.get();
+        resultMonitor.latencyBefore4GetResult();
+        String re =  resultStore.get();
+        resultMonitor.latencyAfter4GetResult();
+        return re;
     }
     public void offer(double input){
         resultMonitor.latencyBefore4Stream();
